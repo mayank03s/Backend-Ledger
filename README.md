@@ -60,18 +60,20 @@ flowchart TD
 A fund transfer creates a transaction record and corresponding debit and credit ledger entries within a MongoDB session.
 
 ```mermaid
-flowchart TD
+
+flowchart LR
     A["Transaction Request"] --> B["Validate Request"]
-    B --> C["Find Sender and Receiver Accounts"]
-    C --> D["Check Existing Transaction"]
-    D --> E["Validate Accounts and Balance"]
-    E --> F["Start MongoDB Session"]
+    B --> C["Find Accounts"]
+    C --> D["Check Idempotency"]
+    D --> E["Validate Balance & Status"]
+    E --> F["Start DB Session"]
     F --> G["Create Transaction"]
-    G --> H["Create Debit Ledger Entry"]
-    H --> I["Create Credit Ledger Entry"]
-    I --> J["Mark Transaction Completed"]
-    J --> K["Commit Database Transaction"]
-    K --> L["Send Email Notification"]
+    G --> H["Debit Entry"]
+    H --> I["Credit Entry"]
+    I --> J["Mark Completed"]
+    J --> K["Commit Transaction"]
+    K --> L["Send Email"]
+
 ```
 
 ---
@@ -293,14 +295,18 @@ The application uses JSON Web Tokens (JWT) for user authentication.
 ### Authentication Flow
 
 ```mermaid
-flowchart TD
+
+flowchart LR
     A["User"] --> B["Register / Login"]
     B --> C["Validate Credentials"]
     C --> D["Generate JWT"]
-    D --> E["Set Cookie and Return Token"]
-    E --> F["Access Protected Routes"]
-    F --> G["Authentication Middleware"]
-    G --> H["Allow or Reject Request"]
+    D --> E["Set Cookie & Return Token"]
+    E --> F["Protected Route"]
+    F --> G["Auth Middleware"]
+    G --> H{"Valid Token?"}
+    H -->|Yes| I["Allow Request"]
+    H -->|No| J["Reject Request"]
+
 ```
 
 ---
