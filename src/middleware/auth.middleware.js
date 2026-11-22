@@ -72,7 +72,7 @@ async function authSystemUserMiddleware(req, res, next) {
 
     // Find system user
     const user = await userModel
-      .findById(decoded.id)
+      .findById(decoded.userId)
       .select("+systemUser");
 
     if (!user) {
