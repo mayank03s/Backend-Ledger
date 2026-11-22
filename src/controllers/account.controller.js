@@ -1,6 +1,6 @@
 const accountModel = require("../models/account.model");
 
-async function createAcccountController(req, res) {
+async function createAccountController(req, res) {
 
     const user = req.user;
 
@@ -45,4 +45,4 @@ async function getAccountBalanceController(req, res) {
 }
 
 
-module.exports = { createAcccountController, getUserAccountController, getAccountBalanceController }
+module.exports = { createAccountController, getUserAccountController, getAccountBalanceController }

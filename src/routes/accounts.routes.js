@@ -10,7 +10,7 @@ const router = express.Router();
  * - Create a new account
  * - Protected Route
  */
-router.post("/", authMiddleware.authMiddleware, accountController.createAcccountController);
+router.post("/", authMiddleware.authMiddleware, accountController.createAccountController);
 
 /**
  * - GET /api/accounts

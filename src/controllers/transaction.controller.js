@@ -4,7 +4,6 @@ const accountModel = require("../models/account.model");
 const emailService = require("../services/email.service");
 const userModel = require("../models/user.model");
 const mongoose = require("mongoose");
-const transcationModel = require("../models/transaction.model");
 
 /**
  * - Create a new transaction
@@ -267,7 +266,7 @@ async function createInitialFundsTransaction(req, res) {
   session.endSession();
 
   return res.status(201).json({
-    message: "Initaial fundstTransaction completed successfully",
+    message: "Initial funds transaction completed successfully",
     transaction: transaction,
   });
 }
