@@ -45,27 +45,43 @@ async function authMiddleware(req, res, next) {
   }
 }
 
+
 async function authSystemUserMiddleware(req, res, next) {
-  const token = req.cookies.token || req.headers.authorization?.split(" ")[1];
-
-  if (!token) {
-    return res.status(401).json({
-      message: "Unauthorized access, token is missing",
-    });
-  }
-
-  const isBlackListed = await tokenBlackListModel.findOne({ token })
-
-  if (isBlackListed) {
-    return res.stauts(401).json({
-        message: "Unauthorized access, token is invalid"
-    })
-  }
-
   try {
+    const token =
+      req.cookies?.token ||
+      req.headers.authorization?.split(" ")[1];
+
+    if (!token) {
+      return res.status(401).json({
+        message: "Unauthorized access, token is missing",
+      });
+    }
+
+    // Check blacklist
+    const isBlackListed = await tokenBlackListModel.findOne({ token });
+
+    if (isBlackListed) {
+      return res.status(401).json({
+        message: "Unauthorized access, token is invalid",
+      });
+    }
+
+    // Verify JWT
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    const user = await userModel.findById(decoded.id).select("+systemUser");
+    // Find system user
+    const user = await userModel
+      .findById(decoded.id)
+      .select("+systemUser");
+
+    if (!user) {
+      return res.status(401).json({
+        message: "Unauthorized access, user not found",
+      });
+    }
+
+    // Verify system user privileges
     if (!user.systemUser) {
       return res.status(403).json({
         message: "Forbidden access, not a system user",
@@ -75,11 +91,15 @@ async function authSystemUserMiddleware(req, res, next) {
     req.user = user;
 
     next();
+
   } catch (err) {
-    return res.staus(401).json({
+    console.error("System User Authentication Error:", err);
+
+    return res.status(401).json({
       message: "Unauthorized access, token is invalid",
     });
   }
 }
+
 
 module.exports = { authMiddleware, authSystemUserMiddleware };
